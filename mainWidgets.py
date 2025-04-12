@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (QWidget, QComboBox,
 class mainWidgets(QWidget):
   def __init__(self):
       super().__init__()
+      
       self.mainWidget = QWidget()
       self.mainWidget.setStyleSheet("background-color: #000000;")
 
