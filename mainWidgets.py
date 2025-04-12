@@ -1,9 +1,19 @@
-from PyQt6.QtWidgets import QWidget, QComboBox, QPushButton, QLabel
+from PyQt6.QtCore import Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import (QWidget, QComboBox,
+                              QPushButton, QLabel,
+                              QLineEdit, QGridLayout,
+                              QVBoxLayout, QHBoxLayout)
 
 class mainWidgets(QWidget):
   def __init__(self):
+      super().__init__()
+
       self.mainWidget = QWidget()
+      self.mainWidget.setStyleSheet("background-color: #000000;")
+
+      self.addBalanceWidget = QWidget()
+      self.addBalanceWidget.setWindowTitle("Add Balance")
 
       self.chart = QWebEngineView()
 
@@ -16,6 +26,8 @@ class mainWidgets(QWidget):
       self.sellButton = QPushButton("Sell")
       self.sellButton.setStyleSheet("background-color: #DB0B1D")
 
+      self.balanceButton = QPushButton("Accept")
+
       self.combobox = QComboBox()
       self.combobox.addItem('Bitcoin')
       self.combobox.addItem('Ethereum')
@@ -25,7 +37,9 @@ class mainWidgets(QWidget):
       self.balance = QLabel("Balance:")
       self.balance.setStyleSheet("color: #FFFFFF;")
 
-      
+      self.addBalance = QLabel("Add the balance amount:")
+
+      self.insertBalance = QLineEdit()
 
       tickerTape = '''
 <div class="tradingview-widget-container">
@@ -117,3 +131,31 @@ class mainWidgets(QWidget):
 
       self.chart.setHtml(self.btcCode)
       self.tickerTape.setHtml(tickerTape)
+
+  def layout(self):
+    self.gridLayout = QGridLayout()
+    self.gridLayout.addWidget(self.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
+    self.gridLayout.addWidget(self.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
+
+    self.comboboxLayout = QVBoxLayout()
+    self.comboboxLayout.addWidget(self.combobox, alignment=Qt.AlignmentFlag.AlignTop)
+    
+    self.balanceMainLayout = QHBoxLayout()
+    self.balanceMainLayout.addWidget(self.balance)
+
+    self.buttonsLayout = QHBoxLayout()
+    self.buttonsLayout.addWidget(self.buyButton)
+    self.buttonsLayout.addWidget(self.sellButton)
+
+    self.comboboxLayout.addLayout(self.balanceMainLayout)
+    self.comboboxLayout.addLayout(self.buttonsLayout)
+    self.gridLayout.addLayout(self.comboboxLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
+
+    self.mainWidget.setLayout(self.gridLayout)
+
+    self.balanceLayout = QVBoxLayout()
+    self.balanceLayout.addWidget(self.addBalance)
+    self.balanceLayout.addWidget(self.insertBalance)
+    self.balanceLayout.addWidget(self.balanceButton)
+
+    self.addBalanceWidget.setLayout(self.balanceLayout)

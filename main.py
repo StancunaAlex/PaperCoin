@@ -1,6 +1,7 @@
-from PyQt6.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout
-from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtCore import QEvent
+from PyQt6.QtGui import QAction, QDoubleValidator
 from mainWidgets import mainWidgets
+from PyQt6.QtWidgets import QMainWindow
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,31 +11,21 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(1280, 800)
 
         self.widgets = mainWidgets()
+        self.setCentralWidget(self.widgets.mainWidget)
 
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
 
-        self.layout()
+        self.bar()
+        self.widgets.layout()
 
-    def layout(self):
-        self.setCentralWidget(self.widgets.mainWidget)
-        self.widgets.mainWidget.setStyleSheet("background-color: #000000;")
+    def bar(self):
+        menuBar = self.menuBar()
+        editMenu = menuBar.addMenu("Edit")
 
-        self.gridLayout = QGridLayout()
-        self.gridLayout.addWidget(self.widgets.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
-        self.gridLayout.addWidget(self.widgets.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
+        addBalance = QAction("Add Balance", self)
+        addBalance.triggered.connect(self.balanceWindow)
 
-        self.comboboxLayout = QVBoxLayout()
-        self.comboboxLayout.addWidget(self.widgets.combobox, alignment=Qt.AlignmentFlag.AlignTop)
-        self.comboboxLayout.addWidget(self.widgets.balance, alignment=Qt.AlignmentFlag.AlignTop)
-
-        self.buttonsLayout = QHBoxLayout()
-        self.buttonsLayout.addWidget(self.widgets.buyButton)
-        self.buttonsLayout.addWidget(self.widgets.sellButton)
-
-        self.comboboxLayout.addLayout(self.buttonsLayout)
-        self.gridLayout.addLayout(self.comboboxLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
-
-        self.widgets.mainWidget.setLayout(self.gridLayout)
+        editMenu.addAction(addBalance)
 
     def resizeEvent(self, event: QEvent):
         windowWidth = self.width()
@@ -54,3 +45,15 @@ class MainWindow(QMainWindow):
             self.widgets.chart.setHtml(self.widgets.ethCode)
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
+
+    def balanceWindow(self):
+        self.widgets.addBalanceWidget.show()
+        self.widgets.balanceButton.clicked.connect(self.balanceLogic)
+
+        validator = QDoubleValidator(self)
+        validator.setBottom(0)
+        self.widgets.insertBalance.setValidator(validator)
+
+    def balanceLogic(self):
+        balanceAmount = self.widgets.insertBalance.text()
+        self.widgets.balance.setText(f"Balance: {balanceAmount} $")
