@@ -2,7 +2,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QWidget, QPushButton, QLineEdit,
     QVBoxLayout, QLabel
-    )
+)
 
 class LoginWindow(QWidget):
     def __init__(self):

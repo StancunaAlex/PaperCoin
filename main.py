@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
 
     def bar(self):
         menuBar = self.menuBar()
-        editMenu = menuBar.addMenu("Edit")
+        editMenu = menuBar.addMenu("File")
 
         addBalance = QAction("Add Balance", self)
         addBalance.triggered.connect(self.balanceWindow)
@@ -57,3 +57,4 @@ class MainWindow(QMainWindow):
     def balanceLogic(self):
         balanceAmount = self.widgets.insertBalance.text()
         self.widgets.balance.setText(f"Balance: {balanceAmount} $")
+        self.widgets.addBalanceWidget.hide()

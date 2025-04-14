@@ -3,7 +3,8 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QPushButton, QLabel,
                               QLineEdit, QGridLayout,
-                              QVBoxLayout, QHBoxLayout)
+                              QVBoxLayout, QHBoxLayout
+)
 
 class mainWidgets(QWidget):
   def __init__(self):
