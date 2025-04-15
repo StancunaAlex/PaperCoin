@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QVBoxLayout, QHBoxLayout
 )
 
-class MainScreen(QWidget):
+class Widgets(QWidget):
   def __init__(self):
       super().__init__()
 
@@ -169,6 +169,9 @@ class MainScreen(QWidget):
 class LoginScreen(QWidget):
   def __init__(self):
     super().__init__()
+    self.setWindowTitle("Login")
+    self.setMinimumSize(400, 300)
+    self.setMaximumSize(500, 400)
 
     self.loginWidgets()
     self.loginLayout()
@@ -196,6 +199,9 @@ class LoginScreen(QWidget):
 class RegisterScreen(QWidget):
   def __init__(self):
     super().__init__()
+    self.setWindowTitle("Register")
+    self.setMinimumSize(400, 300)
+    self.setMaximumSize(500, 400)
 
     self.registerWidgets()
     self.registerLayout()

@@ -1,13 +1,11 @@
 import sys
-from main import InitLogin
+from main import Login
 from PyQt6.QtWidgets import QApplication
 
 def main():
-    paperCoin = QApplication(sys.argv)
-
-    start = InitLogin()
-    
-    paperCoin.exec()
+    app = QApplication(sys.argv)
+    start = Login()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()

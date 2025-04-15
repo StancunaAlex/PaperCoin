@@ -1,58 +1,22 @@
 from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QAction, QDoubleValidator
-from mainWidgets import MainScreen
-from login import LoginWindow
-from register import RegisterWindow
+from mainWidgets import Widgets
 from PyQt6.QtWidgets import QMainWindow
+from mainWidgets import RegisterScreen, LoginScreen
 
-class InitLogin():
-    def __init__(self):
-        self.loginWindow = LoginWindow()
-        self.registerWindow = RegisterWindow()
 
-        self.loginWindow.show()
-        self.logic()
-
-    def logic(self):
-        self.loginWindow.loginScreen.registerButton.clicked.connect(self.showRegisterWindow)
-        self.loginWindow.loginScreen.loginButton.clicked.connect(self.showMainWindow)
-        self.registerWindow.registerScreen.backButton.clicked.connect(self.showLoginWindow)
-
-    def showRegisterWindow(self):
-        self.registerWindow.show()
-        self.loginWindow.hide()
-
-    def showMainWindow(self):
-        self.mainWindow = MainWindow()
-        self.mainWindow.show()
-        self.loginWindow.close()
-
-    def showLoginWindow(self):
-        self.registerWindow.hide()
-        self.loginWindow.show()
-
-class MainWindow(QMainWindow):
+class MainScreen(QMainWindow):
     def __init__(self):
         super().__init__()
-        
-        self.setWindowTitle("PaperCoin")
+        self.setWindowTitle("Papercoin")
         self.setMinimumSize(1280, 800)
 
-        self.widgets = MainScreen()
+        self.widgets = Widgets()
         self.setCentralWidget(self.widgets.mainWidget)
 
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
 
         self.bar()
-
-    def bar(self):
-        menuBar = self.menuBar()
-        editMenu = menuBar.addMenu("File")
-
-        addBalance = QAction("Add Balance", self)
-        addBalance.triggered.connect(self.balanceWindow)
-
-        editMenu.addAction(addBalance)
 
     def resizeEvent(self, event: QEvent):
         windowWidth = self.width()
@@ -73,6 +37,21 @@ class MainWindow(QMainWindow):
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
 
+    def bar(self):
+        menuBar = self.menuBar()
+
+        editMenu = menuBar.addMenu("Edit")
+        settingsMenu = menuBar.addMenu("Settings")
+
+        addBalance = QAction("Add Balance", self)
+        addBalance.triggered.connect(self.balanceWindow)
+
+        logout = QAction("Logout", self)
+        logout.triggered.connect(self.logout)
+
+        editMenu.addAction(addBalance)
+        settingsMenu.addAction(logout)
+
     def balanceWindow(self):
         self.widgets.addBalanceWidget.show()
         self.widgets.balanceButton.clicked.connect(self.balanceLogic)
@@ -85,3 +64,33 @@ class MainWindow(QMainWindow):
         balanceAmount = self.widgets.insertBalance.text()
         self.widgets.balance.setText(f"Balance: {balanceAmount} $")
         self.widgets.addBalanceWidget.close()
+
+    def logout(self):
+        self.close()
+        self.start = Login()
+
+class Login():
+    def __init__(self):
+        self.mainWindow = MainScreen()
+        self.loginWindow = LoginScreen()
+        self.registerWindow = RegisterScreen()
+
+        self.loginWindow.show()
+        self.logic()
+
+    def logic(self):
+        self.loginWindow.registerButton.clicked.connect(self.showRegisterWindow)
+        self.loginWindow.loginButton.clicked.connect(self.showMainWindow)
+        self.registerWindow.backButton.clicked.connect(self.showLoginWindow)
+
+    def showRegisterWindow(self):
+        self.registerWindow.show()
+        self.loginWindow.hide()
+
+    def showMainWindow(self):
+        self.mainWindow.show()
+        self.loginWindow.hide()
+
+    def showLoginWindow(self):
+        self.registerWindow.hide()
+        self.loginWindow.show()
