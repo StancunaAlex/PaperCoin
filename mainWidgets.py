@@ -178,8 +178,10 @@ class LoginScreen(QWidget):
 
   def loginWidgets(self):
 
-    self.usernameInput = QLineEdit("Name")
-    self.passwordInput = QLineEdit("Password")
+    self.usernameInput = QLineEdit()
+    self.usernameInput.setPlaceholderText("Name")
+    self.passwordInput = QLineEdit()
+    self.passwordInput.setPlaceholderText("Password")
 
     self.loginButton = QPushButton("Login")
     self.registerButton = QPushButton("Register")
@@ -207,10 +209,14 @@ class RegisterScreen(QWidget):
     self.registerLayout()
 
   def registerWidgets(self):
-    self.usernameInput = QLineEdit("Name")
-    self.emailInput = QLineEdit("Email")
-    self.passwordInput = QLineEdit("Password")
-    self.reenterPassword = QLineEdit("Re-enter password")
+    self.usernameInput = QLineEdit()
+    self.usernameInput.setPlaceholderText("Name")
+    self.emailInput = QLineEdit()
+    self.emailInput.setPlaceholderText("Email")
+    self.passwordInput = QLineEdit()
+    self.passwordInput.setPlaceholderText("Password")
+    self.reenterPassword = QLineEdit()
+    self.reenterPassword.setPlaceholderText("Re-enter password")
 
     self.backButton = QPushButton("Back")
 
