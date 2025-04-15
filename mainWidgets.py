@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QVBoxLayout, QHBoxLayout
 )
 
+# Initialize widgets
 class Widgets(QWidget):
   def __init__(self):
       super().__init__()
@@ -13,6 +14,7 @@ class Widgets(QWidget):
       self.mainWidgets()
       self.mainLayout()
 
+# Add widgets
   def mainWidgets(self):
       
       self.mainWidget = QWidget()
@@ -42,11 +44,14 @@ class Widgets(QWidget):
 
       self.balance = QLabel("Balance:")
       self.balance.setStyleSheet("color: #FFFFFF;")
+      self.price = QLabel("Price:")
+      self.price.setStyleSheet("color: #FFFFFF;")
 
       self.addBalance = QLabel("Add the balance amount:")
 
       self.insertBalance = QLineEdit()
 
+# Store the code from TradingView
       tickerTape = '''
 <div class="tradingview-widget-container">
   <div class="tradingview-widget-container__widget"></div>
@@ -135,37 +140,47 @@ class Widgets(QWidget):
   </script>
 </div>'''
 
+# Set the code from TradingView
       self.chart.setHtml(self.btcCode)
       self.tickerTape.setHtml(tickerTape)
 
   def mainLayout(self):
+# Main grid layout for the app
     self.gridLayout = QGridLayout()
     self.gridLayout.addWidget(self.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     self.gridLayout.addWidget(self.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
 
-    self.comboboxLayout = QVBoxLayout()
-    self.comboboxLayout.addWidget(self.combobox, alignment=Qt.AlignmentFlag.AlignTop)
+# Add widgets for layouts
+    self.leftLayout = QVBoxLayout()
+    self.leftLayout.addWidget(self.combobox, alignment=Qt.AlignmentFlag.AlignTop)
     
     self.balanceMainLayout = QHBoxLayout()
     self.balanceMainLayout.addWidget(self.balance)
+
+    self.priceLayout = QHBoxLayout()
+    self.priceLayout.addWidget(self.price)
 
     self.buttonsLayout = QHBoxLayout()
     self.buttonsLayout.addWidget(self.buyButton)
     self.buttonsLayout.addWidget(self.sellButton)
 
-    self.comboboxLayout.addLayout(self.balanceMainLayout)
-    self.comboboxLayout.addLayout(self.buttonsLayout)
-    self.gridLayout.addLayout(self.comboboxLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
-
+# Main layout for the left panel
+    self.leftLayout.addLayout(self.balanceMainLayout)
+    self.leftLayout.addLayout(self.priceLayout)
+    self.leftLayout.addLayout(self.buttonsLayout)
+    self.gridLayout.addLayout(self.leftLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
+    
     self.mainWidget.setLayout(self.gridLayout)
 
+# Layout for adding balance
     self.balanceLayout = QVBoxLayout()
     self.balanceLayout.addWidget(self.addBalance)
     self.balanceLayout.addWidget(self.insertBalance)
     self.balanceLayout.addWidget(self.balanceButton)
-
+    
     self.addBalanceWidget.setLayout(self.balanceLayout)
 
+# Login window
 class LoginScreen(QWidget):
   def __init__(self):
     super().__init__()
@@ -188,6 +203,7 @@ class LoginScreen(QWidget):
 
     self.registerText = QLabel("Don't have an account? Register here!")
 
+# Login window layout
   def loginLayout(self):
     layout = QVBoxLayout()
     layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -198,6 +214,7 @@ class LoginScreen(QWidget):
 
     self.setLayout(layout)
 
+# Register window
 class RegisterScreen(QWidget):
   def __init__(self):
     super().__init__()
@@ -220,6 +237,7 @@ class RegisterScreen(QWidget):
 
     self.backButton = QPushButton("Back")
 
+# Register window layout
   def registerLayout(self):
     layout = QVBoxLayout()
     layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)

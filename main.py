@@ -3,21 +3,26 @@ from PyQt6.QtGui import QAction, QDoubleValidator
 from mainWidgets import Widgets
 from PyQt6.QtWidgets import QMainWindow
 from mainWidgets import RegisterScreen, LoginScreen
+from price import fetchPrice
 
-
+# Initialize main window
 class MainScreen(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Papercoin")
         self.setMinimumSize(1280, 800)
 
+# Initialize imports
         self.widgets = Widgets()
         self.setCentralWidget(self.widgets.mainWidget)
 
+# Button functionality
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
+        self.widgets.buyButton.clicked.connect(self.price)
 
         self.bar()
 
+# Resize the right chart
     def resizeEvent(self, event: QEvent):
         windowWidth = self.width()
         windowHeight = self.height()
@@ -29,6 +34,7 @@ class MainScreen(QMainWindow):
 
         super().resizeEvent(event)
 
+# Change the coin using the combobox
     def changeCoin(self, index):
         if index == 0:
             self.widgets.chart.setHtml(self.widgets.btcCode)
@@ -37,6 +43,7 @@ class MainScreen(QMainWindow):
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
 
+# Add a menu bar
     def bar(self):
         menuBar = self.menuBar()
 
@@ -52,6 +59,7 @@ class MainScreen(QMainWindow):
         editMenu.addAction(addBalance)
         settingsMenu.addAction(logout)
 
+# Window on menu bar for adding balance
     def balanceWindow(self):
         self.widgets.addBalanceWidget.show()
         self.widgets.balanceButton.clicked.connect(self.balanceLogic)
@@ -65,9 +73,16 @@ class MainScreen(QMainWindow):
         self.widgets.balance.setText(f"Balance: {balanceAmount} $")
         self.widgets.addBalanceWidget.close()
 
+# Logic for logout
     def logout(self):
         self.close()
         self.start = Login()
+
+# Logic for displaying price
+    def price(self):
+        coinPrice = fetchPrice()
+        self.widgets.price.setText(f"Current coin price: {coinPrice} $")
+
 
 class Login():
     def __init__(self):
