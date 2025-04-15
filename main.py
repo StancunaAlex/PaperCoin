@@ -1,7 +1,35 @@
 from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QAction, QDoubleValidator
-from mainWidgets import mainWidgets
+from mainWidgets import MainScreen
+from login import LoginWindow
+from register import RegisterWindow
 from PyQt6.QtWidgets import QMainWindow
+
+class InitLogin():
+    def __init__(self):
+        self.loginWindow = LoginWindow()
+        self.registerWindow = RegisterWindow()
+
+        self.loginWindow.show()
+        self.logic()
+
+    def logic(self):
+        self.loginWindow.loginScreen.registerButton.clicked.connect(self.showRegisterWindow)
+        self.loginWindow.loginScreen.loginButton.clicked.connect(self.showMainWindow)
+        self.registerWindow.registerScreen.backButton.clicked.connect(self.showLoginWindow)
+
+    def showRegisterWindow(self):
+        self.registerWindow.show()
+        self.loginWindow.hide()
+
+    def showMainWindow(self):
+        self.mainWindow = MainWindow()
+        self.mainWindow.show()
+        self.loginWindow.close()
+
+    def showLoginWindow(self):
+        self.registerWindow.hide()
+        self.loginWindow.show()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,13 +38,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PaperCoin")
         self.setMinimumSize(1280, 800)
 
-        self.widgets = mainWidgets()
+        self.widgets = MainScreen()
         self.setCentralWidget(self.widgets.mainWidget)
 
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
 
         self.bar()
-        self.widgets.layout()
 
     def bar(self):
         menuBar = self.menuBar()
@@ -57,4 +84,4 @@ class MainWindow(QMainWindow):
     def balanceLogic(self):
         balanceAmount = self.widgets.insertBalance.text()
         self.widgets.balance.setText(f"Balance: {balanceAmount} $")
-        self.widgets.addBalanceWidget.hide()
+        self.widgets.addBalanceWidget.close()

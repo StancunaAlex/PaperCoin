@@ -1,8 +1,5 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
-    QWidget, QPushButton, QLineEdit,
-    QVBoxLayout
-)
+from mainWidgets import RegisterScreen
+from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
 class RegisterWindow(QWidget):
     def __init__(self):
@@ -10,27 +7,11 @@ class RegisterWindow(QWidget):
 
         self.setWindowTitle("Register")
         self.setMinimumSize(400, 300)
+        self.setMaximumSize(500, 400)
 
-        self.initUI()
+        self.registerScreen = RegisterScreen()
 
-    def initUI(self):
-        
-        self.usernameInput = QLineEdit("Name")
-        self.emailInput = QLineEdit("Email")
-        self.passwordInput = QLineEdit("Password")
-        self.reenterPassword = QLineEdit("Re-enter password")
-
-        self.backButton = QPushButton("Back")
-
-        self.layoutUI()
-
-    def layoutUI(self):
-        
         layout = QVBoxLayout()
-        layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.emailInput, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.passwordInput, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.reenterPassword, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.backButton, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.registerScreen)
 
         self.setLayout(layout)

@@ -6,9 +6,14 @@ from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QVBoxLayout, QHBoxLayout
 )
 
-class mainWidgets(QWidget):
+class MainScreen(QWidget):
   def __init__(self):
       super().__init__()
+
+      self.mainWidgets()
+      self.mainLayout()
+
+  def mainWidgets(self):
       
       self.mainWidget = QWidget()
       self.mainWidget.setStyleSheet("background-color: #000000;")
@@ -133,7 +138,7 @@ class mainWidgets(QWidget):
       self.chart.setHtml(self.btcCode)
       self.tickerTape.setHtml(tickerTape)
 
-  def layout(self):
+  def mainLayout(self):
     self.gridLayout = QGridLayout()
     self.gridLayout.addWidget(self.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     self.gridLayout.addWidget(self.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
@@ -160,3 +165,55 @@ class mainWidgets(QWidget):
     self.balanceLayout.addWidget(self.balanceButton)
 
     self.addBalanceWidget.setLayout(self.balanceLayout)
+
+class LoginScreen(QWidget):
+  def __init__(self):
+    super().__init__()
+
+    self.loginWidgets()
+    self.loginLayout()
+
+  def loginWidgets(self):
+
+    self.usernameInput = QLineEdit("Name")
+    self.passwordInput = QLineEdit("Password")
+
+    self.loginButton = QPushButton("Login")
+    self.registerButton = QPushButton("Register")
+
+    self.registerText = QLabel("Don't have an account? Register here!")
+
+  def loginLayout(self):
+    layout = QVBoxLayout()
+    layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.passwordInput, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.loginButton, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.registerText, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.registerButton, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    self.setLayout(layout)
+
+class RegisterScreen(QWidget):
+  def __init__(self):
+    super().__init__()
+
+    self.registerWidgets()
+    self.registerLayout()
+
+  def registerWidgets(self):
+    self.usernameInput = QLineEdit("Name")
+    self.emailInput = QLineEdit("Email")
+    self.passwordInput = QLineEdit("Password")
+    self.reenterPassword = QLineEdit("Re-enter password")
+
+    self.backButton = QPushButton("Back")
+
+  def registerLayout(self):
+    layout = QVBoxLayout()
+    layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.emailInput, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.passwordInput, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.reenterPassword, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.backButton, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    self.setLayout(layout)
