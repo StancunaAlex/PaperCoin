@@ -2,11 +2,9 @@ import requests
 
 def fetchPrice():
     try:
-        url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
-        response = requests.get(url)
-        response.raise_for_status()
+        response = requests.get("http://127.0.0.1:5000/btc-price")
         data = response.json()
-        return data["bitcoin"]["usd"]
+        return data["price"]
     except Exception as e:
-        print(f"[ERROR] Failed to fetch BTC price: {e}")
+        print(f"Error: {e}")
         return "Error"
