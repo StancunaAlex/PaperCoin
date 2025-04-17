@@ -1,8 +1,9 @@
 import requests
 
-def fetchPrice():
+def fetch_price(coin_symbol):
     try:
-        response = requests.get("http://127.0.0.1:5000/btc-price")
+        url = f"http://127.0.0.1:5000/price/{coin_symbol}"
+        response = requests.get(url)
         data = response.json()
         return data["price"]
     except Exception as e:

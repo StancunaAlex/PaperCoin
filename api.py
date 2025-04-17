@@ -4,31 +4,45 @@ import time
 
 app = Flask(__name__)
 
-# Simple in-memory cache to avoid rate-limiting
-cache = {
-    "price": None,
-    "timestamp": 0
-}
+# Cache now stores data per coin
+cache = {}
 
 CACHE_TIMEOUT = 10  # seconds
 
-@app.route('/btc-price', methods=['GET'])
-def get_btc_price():
+# Mapping from coin name to CoinGecko ID
+SUPPORTED_COINS = {
+    "btc": "bitcoin",
+    "eth": "ethereum",
+    "sol": "solana"
+    # Add more as needed
+}
+
+@app.route('/price/<coin>', methods=['GET'])
+def get_price(coin):
+    coin = coin
+    if coin not in SUPPORTED_COINS:
+        return jsonify({"error": "Unsupported coin"}), 400
+
+    coin_id = SUPPORTED_COINS[coin]
     current_time = time.time()
 
-    # Use cached value if recent
-    if cache["price"] and (current_time - cache["timestamp"]) < CACHE_TIMEOUT:
-        return jsonify({"price": cache["price"], "cached": True})
+    # Initialize coin cache if not present
+    if coin not in cache:
+        cache[coin] = {"price": None, "timestamp": 0}
+
+    # Return cached value if still valid
+    if cache[coin]["price"] and (current_time - cache[coin]["timestamp"]) < CACHE_TIMEOUT:
+        return jsonify({"price": cache[coin]["price"], "cached": True})
 
     try:
-        url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd"
         response = requests.get(url)
         data = response.json()
-        price = data["bitcoin"]["usd"]
+        price = data[coin_id]["usd"]
 
         # Update cache
-        cache["price"] = price
-        cache["timestamp"] = current_time
+        cache[coin]["price"] = price
+        cache[coin]["timestamp"] = current_time
 
         return jsonify({"price": price, "cached": False})
     except Exception as e:
