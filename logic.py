@@ -14,6 +14,7 @@ class MainScreen(QMainWindow):
 
 # Initialize imports
         self.widgets = Widgets()
+        self.requestPrice = fetchPrice("btc")
         self.setCentralWidget(self.widgets.mainWidget)
 
 # Button functionality
@@ -36,15 +37,22 @@ class MainScreen(QMainWindow):
 
 # Change the coin using the combobox
     def changeCoin(self, index):
+        index == 0
+
         if index == 0:
-            self.coinPrice = fetchPrice("btc")
             self.widgets.chart.setHtml(self.widgets.btcCode)
+            if self.requestPrice != "Error":
+                self.requestPrice = fetchPrice("btc")
+
         if index == 1:
-            self.coinPrice = fetchPrice("eth")
             self.widgets.chart.setHtml(self.widgets.ethCode)
+            if self.requestPrice != "Error":
+                self.requestPrice = fetchPrice("eth")
+
         if index == 2:
-            self.coinPrice = fetchPrice("sol")
             self.widgets.chart.setHtml(self.widgets.solCode)
+            if self.requestPrice != "Error":
+                self.requestPrice = fetchPrice("sol")
 
 # Add a menu bar
     def bar(self):
@@ -83,7 +91,7 @@ class MainScreen(QMainWindow):
 
 # Logic for displaying price
     def price(self):
-        self.widgets.price.setText(f"Current coin price: {self.coinPrice} $")
+        self.widgets.price.setText(f"Current coin price: {self.requestPrice} $")
 
 # Initialize login
 class Login():

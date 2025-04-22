@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 cache = {}
 
-cacheTimeout = 10 
+cacheTimeout = 10
 
 # Add coins and convert them for the url
 coinList = {
@@ -21,7 +21,7 @@ def get_price(coin):
     coinID = coinList[coin]
     cacheTime = time.time()
 
-    # Initialize coin cache if not present
+    # Initialize coin cache
     if coin not in cache:
         cache[coin] = {"price": None, "timestamp": 0}
 
@@ -41,7 +41,8 @@ def get_price(coin):
 
         return jsonify({"price": price, "cached": False})
     except Exception as e:
-        return jsonify({f"error": e}), 500
+        print(f"Error:" , e)
+        return jsonify({f"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
