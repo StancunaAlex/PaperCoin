@@ -1,8 +1,8 @@
 import requests
 
-def fetch_price(coin_symbol):
+def fetchPrice(coinSymbol):
     try:
-        url = f"http://127.0.0.1:5000/price/{coin_symbol}"
+        url = f"http://127.0.0.1:5000/price/{coinSymbol}"
         response = requests.get(url)
         data = response.json()
         return data["price"]

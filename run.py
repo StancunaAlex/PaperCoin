@@ -1,5 +1,5 @@
 import sys
-from main import Login
+from logic import Login
 from PyQt6.QtWidgets import QApplication
 
 def main():

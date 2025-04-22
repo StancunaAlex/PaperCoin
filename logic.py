@@ -3,7 +3,7 @@ from PyQt6.QtGui import QAction, QDoubleValidator
 from mainWidgets import Widgets
 from PyQt6.QtWidgets import QMainWindow
 from mainWidgets import RegisterScreen, LoginScreen
-from price import fetch_price
+from client import fetchPrice
 
 # Initialize main window
 class MainScreen(QMainWindow):
@@ -37,13 +37,13 @@ class MainScreen(QMainWindow):
 # Change the coin using the combobox
     def changeCoin(self, index):
         if index == 0:
-            self.coinPrice = fetch_price("btc")
+            self.coinPrice = fetchPrice("btc")
             self.widgets.chart.setHtml(self.widgets.btcCode)
         if index == 1:
-            self.coinPrice = fetch_price("eth")
+            self.coinPrice = fetchPrice("eth")
             self.widgets.chart.setHtml(self.widgets.ethCode)
         if index == 2:
-            self.coinPrice = fetch_price("sol")
+            self.coinPrice = fetchPrice("sol")
             self.widgets.chart.setHtml(self.widgets.solCode)
 
 # Add a menu bar
