@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QEvent
+from PyQt6.QtCore import QEvent, QTimer
 from PyQt6.QtGui import QAction, QDoubleValidator
 from mainWidgets import Widgets
 from PyQt6.QtWidgets import QMainWindow
@@ -19,7 +19,10 @@ class MainScreen(QMainWindow):
 
 # Button functionality
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
-        self.widgets.buyButton.clicked.connect(self.price)
+
+        self.time = QTimer()
+        self.time.timeout.connect(self.updatePrice)
+        self.time.start(1500)
 
         self.bar()
 
@@ -41,18 +44,15 @@ class MainScreen(QMainWindow):
 
         if index == 0:
             self.widgets.chart.setHtml(self.widgets.btcCode)
-            if self.requestPrice != "Error":
-                self.requestPrice = fetchPrice("btc")
+            self.updatePrice()
 
         if index == 1:
             self.widgets.chart.setHtml(self.widgets.ethCode)
-            if self.requestPrice != "Error":
-                self.requestPrice = fetchPrice("eth")
+            self.updatePrice()
 
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
-            if self.requestPrice != "Error":
-                self.requestPrice = fetchPrice("sol")
+            self.updatePrice()
 
 # Add a menu bar
     def bar(self):
@@ -90,9 +90,19 @@ class MainScreen(QMainWindow):
         self.start = Login()
 
 # Logic for displaying price
-    def price(self):
-        self.widgets.price.setText(f"Current coin price: {self.requestPrice} $")
+    def updatePrice(self):
+        index = self.widgets.combobox.currentIndex()
+        selectedCoin = "btc" if index == 0 else "eth" if index == 1 else "sol"
 
+        self.requestPrice = fetchPrice(selectedCoin)
+
+        if "error" in self.requestPrice:
+            self.widgets.price.setText(f"Error: {self.requestPrice['error']}")
+        elif "price" in self.requestPrice:
+            self.widgets.price.setText(f"Current coin price: {self.requestPrice['price']} $")
+        else:
+            self.widgets.price.setText("Price not available.")
+            
 # Initialize login
 class Login():
     def __init__(self):
