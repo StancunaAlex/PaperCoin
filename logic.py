@@ -1,8 +1,7 @@
 from PyQt6.QtCore import QEvent, QTimer
 from PyQt6.QtGui import QAction, QDoubleValidator
-from mainWidgets import Widgets
 from PyQt6.QtWidgets import QMainWindow
-from mainWidgets import RegisterScreen, LoginScreen
+from mainWidgets import Widgets, RegisterScreen, LoginScreen
 from client import fetchPrice
 
 # Initialize main window
@@ -14,16 +13,17 @@ class MainScreen(QMainWindow):
 
 # Initialize imports
         self.widgets = Widgets()
-        self.requestPrice = fetchPrice("btc")
         self.setCentralWidget(self.widgets.mainWidget)
 
-# Button functionality
-        self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
+        self.widgets.slider.setMaximum(0)
 
-        self.time = QTimer()
-        self.time.timeout.connect(self.updatePrice)
-        self.time.start(1500)
+        # self.requestPrice = fetchPrice("btc")
+        # self.time = QTimer()
+        # self.time.timeout.connect(self.updatePrice)
+        # self.time.start(1500)
 
+        # self.updatePrice()
+        self.buttons()
         self.bar()
 
 # Resize the right chart
@@ -54,6 +54,13 @@ class MainScreen(QMainWindow):
             self.widgets.chart.setHtml(self.widgets.solCode)
             self.updatePrice()
 
+    def buttons(self):
+        self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
+        self.widgets.slider.valueChanged.connect(self.slider)
+
+    def slider(self, value):
+        self.widgets.sliderAmount.setText(f'Amount: {value} $')
+
 # Add a menu bar
     def bar(self):
         menuBar = self.menuBar()
@@ -67,7 +74,11 @@ class MainScreen(QMainWindow):
         logout = QAction("Logout", self)
         logout.triggered.connect(self.logout)
 
+        fees = QAction("Fees and Slippage", self)
+        fees.triggered.connect(self.feesSlippage)
+
         editMenu.addAction(addBalance)
+        settingsMenu.addAction(fees)
         settingsMenu.addAction(logout)
 
 # Window on menu bar for adding balance
@@ -80,29 +91,32 @@ class MainScreen(QMainWindow):
         self.widgets.insertBalance.setValidator(validator)
 
     def balanceLogic(self):
-        balanceAmount = self.widgets.insertBalance.text()
-        self.widgets.balance.setText(f"Balance: {balanceAmount} $")
+        self.balanceAmount = self.widgets.insertBalance.text()
+        self.widgets.balance.setText(f"Balance: {self.balanceAmount} $")
+        self.widgets.slider.setRange(0, int(self.balanceAmount))
         self.widgets.addBalanceWidget.close()
 
-# Logic for logout
-    def logout(self):
-        self.close()
-        self.start = Login()
+    def feesSlippage(self):
+        self.widgets.feesAndSlippage.show()
+        
 
 # Logic for displaying price
     def updatePrice(self):
         index = self.widgets.combobox.currentIndex()
         selectedCoin = "btc" if index == 0 else "eth" if index == 1 else "sol"
 
-        self.requestPrice = fetchPrice(selectedCoin)
+        # self.requestPrice = fetchPrice(selectedCoin)
 
-        if "error" in self.requestPrice:
-            self.widgets.price.setText(f"Error: {self.requestPrice['error']}")
-        elif "price" in self.requestPrice:
-            self.widgets.price.setText(f"Current coin price: {self.requestPrice['price']} $")
-        else:
-            self.widgets.price.setText("Price not available.")
-            
+        # if "error" in self.requestPrice:
+        #     self.widgets.price.setText(f"Error: {self.requestPrice['error']}")
+        # elif "price" in self.requestPrice:
+        #     self.widgets.price.setText(f"Current coin price: {self.requestPrice['price']} $")
+
+# Logic for logout
+    def logout(self):
+        self.close()
+        self.start = Login()
+
 # Initialize login
 class Login():
     def __init__(self):

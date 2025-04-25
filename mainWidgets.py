@@ -3,7 +3,8 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QPushButton, QLabel,
                               QLineEdit, QGridLayout,
-                              QVBoxLayout, QHBoxLayout
+                              QVBoxLayout, QHBoxLayout,
+                              QSlider
 )
 
 # Initialize widgets
@@ -22,6 +23,9 @@ class Widgets(QWidget):
 
       self.addBalanceWidget = QWidget()
       self.addBalanceWidget.setWindowTitle("Add Balance")
+
+      self.feesAndSlippage = QWidget()
+      self.feesAndSlippage.setWindowTitle("Configure fees and slippage")
 
       self.chart = QWebEngineView()
 
@@ -42,14 +46,21 @@ class Widgets(QWidget):
       self.combobox.addItem('Solana')
       self.combobox.setStyleSheet("background-color: #FFFFFF;")
 
-      self.balance = QLabel("Balance:")
+      self.balance = QLabel("Balance: 0 $")
       self.balance.setStyleSheet("color: #FFFFFF;")
       self.price = QLabel("Price:")
       self.price.setStyleSheet("color: #FFFFFF;")
+      self.sliderAmount = QLabel("Amount: 0 $")
+      self.sliderAmount.setStyleSheet("color :#FFFFFF;")
 
       self.addBalance = QLabel("Add the balance amount:")
+      self.fees = QLabel("Set fees amount:")
+      self.slippage = QLabel("Set slippage amount:")
 
       self.insertBalance = QLineEdit()
+
+      self.slider = QSlider()
+      self.slider.setOrientation(Qt.Orientation.Horizontal)
 
 # Store the code from TradingView
       tickerTape = '''
@@ -150,7 +161,7 @@ class Widgets(QWidget):
     self.gridLayout.addWidget(self.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     self.gridLayout.addWidget(self.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
 
-# Add widgets for layouts
+# Add widgets to layouts
     self.leftLayout = QVBoxLayout()
     self.leftLayout.addWidget(self.combobox, alignment=Qt.AlignmentFlag.AlignTop)
     
@@ -159,6 +170,10 @@ class Widgets(QWidget):
 
     self.priceLayout = QHBoxLayout()
     self.priceLayout.addWidget(self.price)
+    self.priceLayout.addWidget(self.sliderAmount)
+
+    self.sliderLayout = QHBoxLayout()
+    self.sliderLayout.addWidget(self.slider)
 
     self.buttonsLayout = QHBoxLayout()
     self.buttonsLayout.addWidget(self.buyButton)
@@ -167,6 +182,7 @@ class Widgets(QWidget):
 # Main layout for the left panel
     self.leftLayout.addLayout(self.balanceMainLayout)
     self.leftLayout.addLayout(self.priceLayout)
+    self.leftLayout.addLayout(self.sliderLayout)
     self.leftLayout.addLayout(self.buttonsLayout)
     self.gridLayout.addLayout(self.leftLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     
