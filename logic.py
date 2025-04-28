@@ -16,13 +16,16 @@ class MainScreen(QMainWindow):
         self.setCentralWidget(self.widgets.mainWidget)
 
         self.widgets.slider.setMaximum(0)
+        self.balanceAmount = 0
+        self.mainAmount = 0
+        self.initialCoin = 0
 
-        # self.requestPrice = fetchPrice("btc")
-        # self.time = QTimer()
-        # self.time.timeout.connect(self.updatePrice)
-        # self.time.start(1500)
+        self.requestPrice = fetchPrice("btc")
+        self.time = QTimer()
+        self.time.timeout.connect(self.updatePrice)
+        self.time.start(1500)
 
-        # self.updatePrice()
+        self.updatePrice()
         self.buttons()
         self.bar()
 
@@ -53,13 +56,16 @@ class MainScreen(QMainWindow):
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
             self.updatePrice()
-
+# Button logic
     def buttons(self):
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
         self.widgets.slider.valueChanged.connect(self.slider)
-
+        self.widgets.buyButton.clicked.connect(self.buy)
+        
+# Slider logic
     def slider(self, value):
         self.widgets.sliderAmount.setText(f'Amount: {value} $')
+        self.sliderValue = int(value)
 
 # Add a menu bar
     def bar(self):
@@ -91,26 +97,41 @@ class MainScreen(QMainWindow):
         self.widgets.insertBalance.setValidator(validator)
 
     def balanceLogic(self):
-        self.balanceAmount = self.widgets.insertBalance.text()
-        self.widgets.balance.setText(f"Balance: {self.balanceAmount} $")
-        self.widgets.slider.setRange(0, int(self.balanceAmount))
+        self.balanceAmount = int(self.widgets.insertBalance.text())
+        self.mainAmount = self.mainAmount + self.balanceAmount
+        self.widgets.balance.setText(f"Balance: {self.mainAmount} $")
+        self.widgets.slider.setRange(0, self.mainAmount)
         self.widgets.addBalanceWidget.close()
 
     def feesSlippage(self):
-        self.widgets.feesAndSlippage.show()
-        
+        self.widgets.feesWidget.show()
+# Buy button logic
+    def buy(self):
+        if self.mainAmount <= 0:
+            self.widgets.error.setText("Insufficient balance!")
+        else:
+            self.widgets.error.setText("")
 
+            self.coinPrice = self.requestPrice['price']
+            self.coinAmount = (self.sliderValue / self.coinPrice) * 100
+            self.initialCoin = self.initialCoin + self.coinAmount
+            self.widgets.invested.setText(f"Invested: {self.initialCoin} {self.selectedCoin}")
+
+            self.mainAmount = self.mainAmount - self.sliderValue
+            self.widgets.balance.setText(f"Balance: {self.mainAmount} $")
+            self.widgets.slider.setRange(0, self.mainAmount)
+        
 # Logic for displaying price
     def updatePrice(self):
         index = self.widgets.combobox.currentIndex()
-        selectedCoin = "btc" if index == 0 else "eth" if index == 1 else "sol"
+        self.selectedCoin = "btc" if index == 0 else "eth" if index == 1 else "sol"
 
-        # self.requestPrice = fetchPrice(selectedCoin)
+        self.requestPrice = fetchPrice(self.selectedCoin)
 
-        # if "error" in self.requestPrice:
-        #     self.widgets.price.setText(f"Error: {self.requestPrice['error']}")
-        # elif "price" in self.requestPrice:
-        #     self.widgets.price.setText(f"Current coin price: {self.requestPrice['price']} $")
+        if "error" in self.requestPrice:
+            self.widgets.price.setText(f"Error: Too many requests!")
+        elif "price" in self.requestPrice:
+            self.widgets.price.setText(f"Current coin price: {self.requestPrice['price']} $")
 
 # Logic for logout
     def logout(self):

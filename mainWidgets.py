@@ -23,9 +23,11 @@ class Widgets(QWidget):
 
       self.addBalanceWidget = QWidget()
       self.addBalanceWidget.setWindowTitle("Add Balance")
+      self.addBalanceWidget.setMaximumSize(200, 96)
 
-      self.feesAndSlippage = QWidget()
-      self.feesAndSlippage.setWindowTitle("Configure fees and slippage")
+      self.feesWidget = QWidget()
+      self.feesWidget.setWindowTitle("Configure fees and slippage")
+      self.feesWidget.setMaximumSize(200, 116)
 
       self.chart = QWebEngineView()
 
@@ -52,12 +54,23 @@ class Widgets(QWidget):
       self.price.setStyleSheet("color: #FFFFFF;")
       self.sliderAmount = QLabel("Amount: 0 $")
       self.sliderAmount.setStyleSheet("color :#FFFFFF;")
+      self.error = QLabel()
+      self.error.setStyleSheet("color :#FFFFFF;")
+      self.invested = QLabel("Invested: 0")
+      self.invested.setStyleSheet("color :#FFFFFF;")
 
       self.addBalance = QLabel("Add the balance amount:")
-      self.fees = QLabel("Set fees amount:")
-      self.slippage = QLabel("Set slippage amount:")
+      self.fees = QLabel("Adjust fees amount:")
+      self.fees.setToolTip("Fees are small fixed percentage charged for each buy or sell.")
+      self.slippage = QLabel("Adjust slippage amount:")
+      self.slippage.setToolTip("Slippage is the difference between the expected price"
+      " and the actual price when a trade happens.")
 
       self.insertBalance = QLineEdit()
+      self.insertFees = QLineEdit()
+      self.insertFees.setPlaceholderText("0.2")
+      self.insertSlippage = QLineEdit()
+      self.insertSlippage.setPlaceholderText("0.05")
 
       self.slider = QSlider()
       self.slider.setOrientation(Qt.Orientation.Horizontal)
@@ -163,7 +176,7 @@ class Widgets(QWidget):
 
 # Add widgets to layouts
     self.leftLayout = QVBoxLayout()
-    self.leftLayout.addWidget(self.combobox, alignment=Qt.AlignmentFlag.AlignTop)
+    self.leftLayout.addWidget(self.combobox)
     
     self.balanceMainLayout = QHBoxLayout()
     self.balanceMainLayout.addWidget(self.balance)
@@ -175,6 +188,12 @@ class Widgets(QWidget):
     self.sliderLayout = QHBoxLayout()
     self.sliderLayout.addWidget(self.slider)
 
+    self.investedLayout = QHBoxLayout()
+    self.investedLayout.addWidget(self.invested)
+
+    self.errorLayout = QHBoxLayout()
+    self.errorLayout.addWidget(self.error)
+
     self.buttonsLayout = QHBoxLayout()
     self.buttonsLayout.addWidget(self.buyButton)
     self.buttonsLayout.addWidget(self.sellButton)
@@ -183,7 +202,9 @@ class Widgets(QWidget):
     self.leftLayout.addLayout(self.balanceMainLayout)
     self.leftLayout.addLayout(self.priceLayout)
     self.leftLayout.addLayout(self.sliderLayout)
+    self.leftLayout.addLayout(self.investedLayout)
     self.leftLayout.addLayout(self.buttonsLayout)
+    self.gridLayout.addLayout(self.errorLayout, 3, 0 , 1, 1)
     self.gridLayout.addLayout(self.leftLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     
     self.mainWidget.setLayout(self.gridLayout)
@@ -195,6 +216,15 @@ class Widgets(QWidget):
     self.balanceLayout.addWidget(self.balanceButton)
     
     self.addBalanceWidget.setLayout(self.balanceLayout)
+
+# Layout for adjusting fees and slippage
+    self.feesLayout = QVBoxLayout()
+    self.feesLayout.addWidget(self.fees)
+    self.feesLayout.addWidget(self.insertFees)
+    self.feesLayout.addWidget(self.slippage)
+    self.feesLayout.addWidget(self.insertSlippage)
+
+    self.feesWidget.setLayout(self.feesLayout)
 
 # Login window
 class LoginScreen(QWidget):
