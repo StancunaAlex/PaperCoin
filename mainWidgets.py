@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (QWidget, QComboBox,
                               QPushButton, QLabel,
                               QLineEdit, QGridLayout,
                               QVBoxLayout, QHBoxLayout,
-                              QSlider
+                              QDoubleSpinBox
 )
 
 # Initialize widgets
@@ -21,6 +21,9 @@ class Widgets(QWidget):
       self.mainWidget = QWidget()
       self.mainWidget.setStyleSheet("background-color: #000000;")
 
+      self.errorWidget = QWidget()
+      self.errorWidget.setWindowTitle("Error")
+
       self.addBalanceWidget = QWidget()
       self.addBalanceWidget.setWindowTitle("Add Balance")
       self.addBalanceWidget.setMaximumSize(200, 96)
@@ -34,31 +37,72 @@ class Widgets(QWidget):
       self.tickerTape = QWebEngineView()
       self.tickerTape.setFixedHeight(60)
 
+      self.buyButtonsStyle = """
+            QPushButton {
+                background-color: #303336;    
+                color: #BAC7CF;               
+                border-radius: 5px;
+                padding: 6px 12px;
+            }"""
+
+      textStyle = "color: #BAC7CF;"
+
+      self.activeBuyStyle = """
+    QPushButton {
+        background-color: #303336;    
+        color: #BAC7CF;               
+        border: 1px solid #0ABF34;     
+        border-radius: 5px;
+        padding: 6px 12px;
+    }
+"""
       self.buyButton = QPushButton("Buy")
-      self.buyButton.setStyleSheet("background-color: #0CDB3C;")
+      self.buyButton.setStyleSheet("background-color: #0ABF34;")
+      self.firstBuyButton = QPushButton("25%")
+      self.firstBuyButton.setStyleSheet(self.buyButtonsStyle)
+      self.secondBuyButton = QPushButton("50%")
+      self.secondBuyButton.setStyleSheet(self.buyButtonsStyle)
+      self.thirdBuyButton = QPushButton("75%")
+      self.thirdBuyButton.setStyleSheet(self.buyButtonsStyle)
+      self.fourthBuyButton = QPushButton("100%")
+      self.fourthBuyButton.setStyleSheet(self.buyButtonsStyle)
 
       self.sellButton = QPushButton("Sell")
-      self.sellButton.setStyleSheet("background-color: #DB0B1D")
+      self.sellButton.setStyleSheet("background-color: #BF0A19")
+      self.firstSellButton = QPushButton("25%")
+      self.firstSellButton.setStyleSheet(self.buyButtonsStyle)
+      self.secondSellButton = QPushButton("50%")
+      self.secondSellButton.setStyleSheet(self.buyButtonsStyle)
+      self.thirdSellButton = QPushButton("75")
+      self.thirdSellButton.setStyleSheet(self.buyButtonsStyle)
+      self.fourthSellButton = QPushButton("100%")
+      self.fourthSellButton.setStyleSheet(self.buyButtonsStyle)
 
       self.balanceButton = QPushButton("Accept")
+      self.feesButton = QPushButton("Accept")
 
       self.combobox = QComboBox()
       self.combobox.addItem('Bitcoin')
       self.combobox.addItem('Ethereum')
       self.combobox.addItem('Solana')
-      self.combobox.setStyleSheet("background-color: #FFFFFF;")
+      self.combobox.setStyleSheet("""background-color: #303336;
+                                  color: #BAC7CF;""")
 
       self.balance = QLabel("Balance: 0 $")
-      self.balance.setStyleSheet("color: #FFFFFF;")
+      self.balance.setStyleSheet(textStyle)
       self.price = QLabel("Price:")
-      self.price.setStyleSheet("color: #FFFFFF;")
-      self.sliderAmount = QLabel("Amount: 0 $")
-      self.sliderAmount.setStyleSheet("color :#FFFFFF;")
+      self.price.setStyleSheet(textStyle)
+      self.buyBoxAmount = QLabel("Amount: 0 $")
+      self.buyBoxAmount.setStyleSheet(textStyle)
       self.error = QLabel()
-      self.error.setStyleSheet("color :#FFFFFF;")
+      self.error.setStyleSheet(textStyle)
+      self.errorText = QLabel()
       self.invested = QLabel("Invested: 0")
-      self.invested.setStyleSheet("color :#FFFFFF;")
+      self.invested.setStyleSheet(textStyle)
+      self.sellBoxAmount = QLabel("Amount: 0")
+      self.sellBoxAmount.setStyleSheet(textStyle)
 
+      self.insertFeesText = QLabel("Default is set to 0.2 for fees and 0.05 for slippage")
       self.addBalance = QLabel("Add the balance amount:")
       self.fees = QLabel("Adjust fees amount:")
       self.fees.setToolTip("Fees are small fixed percentage charged for each buy or sell.")
@@ -68,12 +112,16 @@ class Widgets(QWidget):
 
       self.insertBalance = QLineEdit()
       self.insertFees = QLineEdit()
-      self.insertFees.setPlaceholderText("0.2")
       self.insertSlippage = QLineEdit()
-      self.insertSlippage.setPlaceholderText("0.05")
 
-      self.slider = QSlider()
-      self.slider.setOrientation(Qt.Orientation.Horizontal)
+      self.buyBox = QDoubleSpinBox()
+      self.buyBox.clear()
+      self.buyBox.setStyleSheet(textStyle)
+
+      self.sellBox = QDoubleSpinBox()
+      self.sellBox.setDecimals(15)
+      self.sellBox.clear()
+      self.sellBox.setStyleSheet(textStyle)
 
 # Store the code from TradingView
       tickerTape = '''
@@ -183,13 +231,17 @@ class Widgets(QWidget):
 
     self.priceLayout = QHBoxLayout()
     self.priceLayout.addWidget(self.price)
-    self.priceLayout.addWidget(self.sliderAmount)
+    self.priceLayout.addWidget(self.buyBoxAmount)
 
-    self.sliderLayout = QHBoxLayout()
-    self.sliderLayout.addWidget(self.slider)
+    self.buyBoxLayout = QHBoxLayout()
+    self.buyBoxLayout.addWidget(self.buyBox)
+    
+    self.sellBoxLayout = QHBoxLayout()
+    self.sellBoxLayout.addWidget(self.sellBox)
 
     self.investedLayout = QHBoxLayout()
     self.investedLayout.addWidget(self.invested)
+    self.investedLayout.addWidget(self.sellBoxAmount)
 
     self.errorLayout = QHBoxLayout()
     self.errorLayout.addWidget(self.error)
@@ -198,12 +250,32 @@ class Widgets(QWidget):
     self.buttonsLayout.addWidget(self.buyButton)
     self.buttonsLayout.addWidget(self.sellButton)
 
+    self.buyLayout = QHBoxLayout()
+    self.buyLayout.addWidget(self.firstBuyButton)
+    self.buyLayout.addWidget(self.secondBuyButton)
+    self.buyLayout.addWidget(self.thirdBuyButton)
+    self.buyLayout.addWidget(self.fourthBuyButton)
+
+    self.sellLayout = QHBoxLayout()
+    self.sellLayout.addWidget(self.firstSellButton)
+    self.sellLayout.addWidget(self.secondSellButton)
+    self.sellLayout.addWidget(self.thirdSellButton)
+    self.sellLayout.addWidget(self.fourthSellButton)
+
+    self.errorTextLayout = QVBoxLayout()
+    self.errorTextLayout.addWidget(self.errorText)
+    self.errorWidget.setLayout(self.errorTextLayout)
+
 # Main layout for the left panel
     self.leftLayout.addLayout(self.balanceMainLayout)
     self.leftLayout.addLayout(self.priceLayout)
-    self.leftLayout.addLayout(self.sliderLayout)
+    self.leftLayout.addLayout(self.buyBoxLayout)
+    self.leftLayout.addLayout(self.buyLayout)
     self.leftLayout.addLayout(self.investedLayout)
+    self.leftLayout.addLayout(self.sellBoxLayout)
+    self.leftLayout.addLayout(self.sellLayout)
     self.leftLayout.addLayout(self.buttonsLayout)
+
     self.gridLayout.addLayout(self.errorLayout, 3, 0 , 1, 1)
     self.gridLayout.addLayout(self.leftLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     
@@ -219,10 +291,12 @@ class Widgets(QWidget):
 
 # Layout for adjusting fees and slippage
     self.feesLayout = QVBoxLayout()
+    self.feesLayout.addWidget(self.insertFeesText)
     self.feesLayout.addWidget(self.fees)
     self.feesLayout.addWidget(self.insertFees)
     self.feesLayout.addWidget(self.slippage)
     self.feesLayout.addWidget(self.insertSlippage)
+    self.feesLayout.addWidget(self.feesButton)
 
     self.feesWidget.setLayout(self.feesLayout)
 

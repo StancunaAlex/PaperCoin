@@ -14,7 +14,7 @@ coinList = {
 def get_price(coin):
     if coin not in coinList:
         return jsonify({"error": "Coin not found"}), 400
-    
+
     coinID = coinList[coin]
 
     try:
@@ -25,9 +25,7 @@ def get_price(coin):
         price = data[coinID]["usd"]
 
         return jsonify({"price": price, "cached": False})
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching data from CoinGecko: {e}")
-        return jsonify({"error": "Failed to fetch data from CoinGecko"}), 500
+
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({"error": str(e)}), 500

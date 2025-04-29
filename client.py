@@ -8,10 +8,10 @@ def fetchPrice(coinSymbol):
     currentTime = time.time()
 
     if coinSymbol in cache:
-        cached_data = cache[coinSymbol]
-        if currentTime - cached_data["timestamp"] < CACHE_TIMEOUT:
+        cachedData = cache[coinSymbol]
+        if currentTime - cachedData["timestamp"] < CACHE_TIMEOUT:
             print(f"Using cached price for {coinSymbol}")
-            return {"price": cached_data["price"], "cached": True}
+            return {"price": cachedData["price"], "cached": True}
 
     try:
         url = f"http://127.0.0.1:5000/price/{coinSymbol}"

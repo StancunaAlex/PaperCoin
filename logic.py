@@ -1,5 +1,5 @@
 from PyQt6.QtCore import QEvent, QTimer
-from PyQt6.QtGui import QAction, QDoubleValidator
+from PyQt6.QtGui import QAction, QDoubleValidator, QRegularExpressionValidator
 from PyQt6.QtWidgets import QMainWindow
 from mainWidgets import Widgets, RegisterScreen, LoginScreen
 from client import fetchPrice
@@ -15,10 +15,17 @@ class MainScreen(QMainWindow):
         self.widgets = Widgets()
         self.setCentralWidget(self.widgets.mainWidget)
 
-        self.widgets.slider.setMaximum(0)
+# Set variables
+        self.widgets.buyBox.setMaximum(0)
+        self.widgets.sellBox.setMaximum(0)
         self.balanceAmount = 0
         self.mainAmount = 0
         self.initialCoin = 0
+        self.feesPercentage = 0.2
+        self.slippagePercentage = 0.05
+        self.profit = 0
+        self.formattedMainAmount = 0
+        self.formattedCoinAmount = 0
 
         self.requestPrice = fetchPrice("btc")
         self.time = QTimer()
@@ -56,16 +63,36 @@ class MainScreen(QMainWindow):
         if index == 2:
             self.widgets.chart.setHtml(self.widgets.solCode)
             self.updatePrice()
+
 # Button logic
     def buttons(self):
         self.widgets.combobox.currentIndexChanged.connect(self.changeCoin)
-        self.widgets.slider.valueChanged.connect(self.slider)
+        self.widgets.buyBox.valueChanged.connect(self.buyBox)
+        self.widgets.sellBox.valueChanged.connect(self.sellBox)
         self.widgets.buyButton.clicked.connect(self.buy)
-        
-# Slider logic
-    def slider(self, value):
-        self.widgets.sliderAmount.setText(f'Amount: {value} $')
-        self.sliderValue = int(value)
+        self.widgets.sellButton.clicked.connect(self.sell)
+
+        buttons = [
+        self.widgets.firstBuyButton,
+        self.widgets.secondBuyButton,
+        self.widgets.thirdBuyButton,
+        self.widgets.fourthBuyButton,
+        self.widgets.firstSellButton,
+        self.widgets.secondSellButton,
+        self.widgets.thirdSellButton,
+        self.widgets.fourthSellButton
+]
+        for button in buttons:
+            button.clicked.connect(self.setPercentage)
+
+# DoubleBox logic
+    def buyBox(self, value):
+        self.widgets.buyBoxAmount.setText(f'Amount: {value} $')
+        self.buyBoxValue = float(value)
+
+    def sellBox(self, value):
+        self.widgets.sellBoxAmount.setText(f'Amount: {value} {self.selectedCoin}')
+        self.sellBoxValue = float(value)
 
 # Add a menu bar
     def bar(self):
@@ -92,35 +119,148 @@ class MainScreen(QMainWindow):
         self.widgets.addBalanceWidget.show()
         self.widgets.balanceButton.clicked.connect(self.balanceLogic)
 
-        validator = QDoubleValidator(self)
-        validator.setBottom(0)
-        self.widgets.insertBalance.setValidator(validator)
+        balanceValidator = QDoubleValidator(self)
+        balanceValidator.setBottom(0)
+        self.widgets.insertBalance.setValidator(balanceValidator)
 
     def balanceLogic(self):
-        self.balanceAmount = int(self.widgets.insertBalance.text())
+        self.balanceAmount = float(self.widgets.insertBalance.text())
         self.mainAmount = self.mainAmount + self.balanceAmount
         self.widgets.balance.setText(f"Balance: {self.mainAmount} $")
-        self.widgets.slider.setRange(0, self.mainAmount)
+        self.widgets.buyBox.setRange(0, self.mainAmount)
         self.widgets.addBalanceWidget.close()
+        self.setPercentage()
 
+# Fees and slippage logic
     def feesSlippage(self):
         self.widgets.feesWidget.show()
+        self.widgets.feesButton.clicked.connect(self.feesLogic)
+
+        feesValidator = QRegularExpressionValidator()
+        self.widgets.insertFees.setValidator(feesValidator)
+        self.widgets.insertSlippage.setValidator(feesValidator)
+
+    def feesLogic(self):
+        self.feesPercentage = float(self.widgets.insertFees.text())
+        self.slippagePercentage = float(self.widgets.insertSlippage.text())
+        if self.feesPercentage < 0 or self.slippagePercentage < 0:
+            self.widgets.errorText.setStyleSheet("color :#000000;")
+            self.widgets.errorText.setText("Cannot use negative numbers")
+            self.widgets.errorWidget.show()
+        else:
+            self.widgets.feesWidget.close()
+
 # Buy button logic
     def buy(self):
         if self.mainAmount <= 0:
             self.widgets.error.setText("Insufficient balance!")
+            self.widgets.buyBox.clear()
+
+            for btn in self.percentageButtons:
+                btn.setStyleSheet(self.widgets.buyButtonsStyle)
+
         else:
             self.widgets.error.setText("")
 
-            self.coinPrice = self.requestPrice['price']
-            self.coinAmount = (self.sliderValue / self.coinPrice) * 100
-            self.initialCoin = self.initialCoin + self.coinAmount
-            self.widgets.invested.setText(f"Invested: {self.initialCoin} {self.selectedCoin}")
+            self.fees = self.feesPercentage / 100
+            self.slippage = self.slippagePercentage / 100
 
-            self.mainAmount = self.mainAmount - self.sliderValue
-            self.widgets.balance.setText(f"Balance: {self.mainAmount} $")
-            self.widgets.slider.setRange(0, self.mainAmount)
+            self.coinPrice = self.requestPrice['price']
+            self.coinAmount = self.buyBoxValue * (1 - self.fees) / self.coinPrice * (1 + self.slippage)
+            self.initialCoin = self.initialCoin + self.coinAmount
+            self.formattedCoinAmount = round(self.initialCoin, 6)
+            self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
+
+            self.mainAmount = self.mainAmount - self.buyBoxValue
+            self.formattedMainAmount = round(self.mainAmount, 2)
+            self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
+            self.widgets.buyBox.setRange(0, self.formattedMainAmount)
+            self.widgets.sellBox.setRange(0, float(self.formattedCoinAmount))
+
+            for btn in self.percentageButtons:
+                btn.setStyleSheet(self.widgets.buyButtonsStyle)
+
+            self.widgets.buyBox.clear()
+
+# Sell button logic
+    def sell(self):
+        if self.initialCoin <= 0:
+            self.widgets.error.setText(f"Not enough {self.selectedCoin}")
+            self.widgets.sellBox.clear()
+
+            for btn in self.percentageButtons:
+                btn.setStyleSheet(self.widgets.buyButtonsStyle)
+                
+        else:
+            self.widgets.error.setText("")
+            self.initialCoin = self.initialCoin - self.sellBoxValue
+            self.formattedCoinAmount = round(self.initialCoin, 6)
+            self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
+            
+            self.rawProfit = self.coinPrice * self.sellBoxValue
+            self.losesFromFees = self.rawProfit * (self.fees + self.slippage)
+            self.finalProfit = self.rawProfit - self.losesFromFees
+            self.mainAmount = self.mainAmount + self.finalProfit
+            self.formattedMainAmount = round(self.mainAmount, 2)
+            self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
+            self.widgets.buyBox.setRange(0, self.formattedMainAmount)
+
+            for btn in self.percentageButtons:
+                btn.setStyleSheet(self.widgets.buyButtonsStyle)
+
+            self.widgets.sellBox.clear()
+
+
+    def setPercentage(self):
+        buttonClick = self.sender()
+
+        self.percentageButtons = [self.widgets.firstBuyButton,
+                   self.widgets.secondBuyButton,
+                   self.widgets.thirdBuyButton,
+                   self.widgets.fourthBuyButton,
+                   self.widgets.firstSellButton,
+                   self.widgets.secondSellButton,
+                   self.widgets.thirdSellButton,
+                   self.widgets.fourthSellButton
+                   ]
         
+        for btn in self.percentageButtons:
+            btn.setStyleSheet(self.widgets.buyButtonsStyle)
+
+            buttonClick.setStyleSheet(self.widgets.activeBuyStyle)
+
+        if buttonClick == self.widgets.firstBuyButton:
+            firstPercentageAmount = (25 / 100) * self.mainAmount
+            self.widgets.buyBox.setValue(round(firstPercentageAmount, 2))
+
+        elif buttonClick == self.widgets.secondBuyButton:
+            secondPercentageAmount = (50 / 100) * self.mainAmount
+            self.widgets.buyBox.setValue(round(secondPercentageAmount, 2))
+
+        elif buttonClick == self.widgets.thirdBuyButton:
+            thirdPercentageAmount = (75 / 100) * self.mainAmount
+            self.widgets.buyBox.setValue(round(thirdPercentageAmount, 2))
+
+        elif buttonClick == self.widgets.fourthBuyButton:
+            fourthPercentageAmount = (100 / 100) * self.mainAmount
+            self.widgets.buyBox.setValue(round(fourthPercentageAmount, 2))
+
+        elif buttonClick == self.widgets.firstSellButton:
+            firstSellPercentageAmount = (25 / 100) * self.initialCoin
+            self.widgets.sellBox.setValue(round(firstSellPercentageAmount, 6))
+
+        elif buttonClick == self.widgets.secondSellButton:
+            secondSellPercentageAmount = (50 / 100) * self.initialCoin
+            self.widgets.sellBox.setValue(round(secondSellPercentageAmount, 6))
+
+        elif buttonClick == self.widgets.thirdSellButton:
+            thirdSellPercentageAmount = (75 / 100) * self.initialCoin
+            self.widgets.sellBox.setValue(round(thirdSellPercentageAmount, 6))
+
+        elif buttonClick == self.widgets.fourthSellButton:
+            fourthSellPercentageAmount = (100 / 100) * self.initialCoin
+            self.widgets.sellBox.setValue(round(fourthSellPercentageAmount, 6))
+
 # Logic for displaying price
     def updatePrice(self):
         index = self.widgets.combobox.currentIndex()
