@@ -73,7 +73,7 @@ class Widgets(QWidget):
       self.firstSellButton.setStyleSheet(self.buyButtonsStyle)
       self.secondSellButton = QPushButton("50%")
       self.secondSellButton.setStyleSheet(self.buyButtonsStyle)
-      self.thirdSellButton = QPushButton("75")
+      self.thirdSellButton = QPushButton("75%")
       self.thirdSellButton.setStyleSheet(self.buyButtonsStyle)
       self.fourthSellButton = QPushButton("100%")
       self.fourthSellButton.setStyleSheet(self.buyButtonsStyle)

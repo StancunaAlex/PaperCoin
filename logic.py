@@ -156,26 +156,32 @@ class MainScreen(QMainWindow):
             self.widgets.error.setText("Insufficient balance!")
             self.widgets.buyBox.clear()
 
-            for btn in self.percentageButtons:
-                btn.setStyleSheet(self.widgets.buyButtonsStyle)
+        elif self.buyBoxValue == 0:
+            self.widgets.error.setText("No buy value selected!")
 
         else:
             self.widgets.error.setText("")
+            if round(self.mainAmount, 2) < round(self.buyBoxValue, 2):
+                self.widgets.error.setText("Insufficient balance!")
 
-            self.fees = self.feesPercentage / 100
-            self.slippage = self.slippagePercentage / 100
+            else:
+                self.fees = self.feesPercentage / 100
+                self.slippage = self.slippagePercentage / 100
 
-            self.coinPrice = self.requestPrice['price']
-            self.coinAmount = self.buyBoxValue * (1 - self.fees) / self.coinPrice * (1 + self.slippage)
-            self.initialCoin = self.initialCoin + self.coinAmount
-            self.formattedCoinAmount = round(self.initialCoin, 6)
-            self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
+                self.coinPrice = self.requestPrice['price']
+                adjustedPrice = self.coinPrice * (1 + self.slippage)
+                self.coinAmount = self.buyBoxValue * (1 - self.fees) / adjustedPrice
+                self.initialCoin = self.initialCoin + self.coinAmount
+                self.formattedCoinAmount = round(self.initialCoin, 6)
+                self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
 
-            self.mainAmount = self.mainAmount - self.buyBoxValue
-            self.formattedMainAmount = round(self.mainAmount, 2)
-            self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
-            self.widgets.buyBox.setRange(0, self.formattedMainAmount)
-            self.widgets.sellBox.setRange(0, float(self.formattedCoinAmount))
+                self.mainAmount = self.mainAmount - self.buyBoxValue
+                self.formattedMainAmount = round(self.mainAmount, 2)
+                self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
+                self.widgets.buyBox.setRange(0, self.formattedMainAmount)
+                self.widgets.sellBox.setRange(0, float(self.formattedCoinAmount))
+                if abs(self.mainAmount) < 1e-6:
+                    self.mainAmount = 0.0
 
             for btn in self.percentageButtons:
                 btn.setStyleSheet(self.widgets.buyButtonsStyle)
@@ -185,31 +191,38 @@ class MainScreen(QMainWindow):
 # Sell button logic
     def sell(self):
         if self.initialCoin <= 0:
-            self.widgets.error.setText(f"Not enough {self.selectedCoin}")
+            self.widgets.error.setText(f"Not enough {self.selectedCoin.upper()}!")
             self.widgets.sellBox.clear()
 
-            for btn in self.percentageButtons:
-                btn.setStyleSheet(self.widgets.buyButtonsStyle)
-                
+        elif self.sellBoxValue == 0:
+            self.widgets.error.setText("No sell value selected!")
+
         else:
             self.widgets.error.setText("")
-            self.initialCoin = self.initialCoin - self.sellBoxValue
-            self.formattedCoinAmount = round(self.initialCoin, 6)
-            self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
-            
-            self.rawProfit = self.coinPrice * self.sellBoxValue
-            self.losesFromFees = self.rawProfit * (self.fees + self.slippage)
-            self.finalProfit = self.rawProfit - self.losesFromFees
-            self.mainAmount = self.mainAmount + self.finalProfit
-            self.formattedMainAmount = round(self.mainAmount, 2)
-            self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
-            self.widgets.buyBox.setRange(0, self.formattedMainAmount)
+            if round(self.initialCoin, 6) < round(self.sellBoxValue, 6):
+                self.widgets.error.setText(f"Not enought {self.selectedCoin.upper()}!")
+            else:
+                self.initialCoin = self.initialCoin - self.sellBoxValue
+                if abs(self.initialCoin) < 1e-6:
+                    self.initialCoin = 0.0
+                self.formattedCoinAmount = round(self.initialCoin, 6)
+                self.widgets.invested.setText(f"Invested: {self.formattedCoinAmount} {self.selectedCoin}")
+
+                adjustedPrice = self.coinPrice * (1 - self.slippage)
+                self.rawProfit = adjustedPrice * self.sellBoxValue
+                self.finalProfit = self.rawProfit * (1 - self.fees)
+
+                self.mainAmount = self.mainAmount + self.finalProfit
+                if abs(self.mainAmount) < 1e-6:
+                    self.mainAmount = 0.0
+                self.formattedMainAmount = round(self.mainAmount, 2)
+                self.widgets.balance.setText(f"Balance: {self.formattedMainAmount} $")
+                self.widgets.buyBox.setRange(0, self.formattedMainAmount)
 
             for btn in self.percentageButtons:
                 btn.setStyleSheet(self.widgets.buyButtonsStyle)
 
             self.widgets.sellBox.clear()
-
 
     def setPercentage(self):
         buttonClick = self.sender()
@@ -223,7 +236,7 @@ class MainScreen(QMainWindow):
                    self.widgets.thirdSellButton,
                    self.widgets.fourthSellButton
                    ]
-        
+
         for btn in self.percentageButtons:
             btn.setStyleSheet(self.widgets.buyButtonsStyle)
 
@@ -242,8 +255,8 @@ class MainScreen(QMainWindow):
             self.widgets.buyBox.setValue(round(thirdPercentageAmount, 2))
 
         elif buttonClick == self.widgets.fourthBuyButton:
-            fourthPercentageAmount = (100 / 100) * self.mainAmount
-            self.widgets.buyBox.setValue(round(fourthPercentageAmount, 2))
+            fourthPercentageAmount = min(self.mainAmount, round(self.mainAmount, 2))
+            self.widgets.buyBox.setValue(fourthPercentageAmount)
 
         elif buttonClick == self.widgets.firstSellButton:
             firstSellPercentageAmount = (25 / 100) * self.initialCoin
@@ -258,8 +271,8 @@ class MainScreen(QMainWindow):
             self.widgets.sellBox.setValue(round(thirdSellPercentageAmount, 6))
 
         elif buttonClick == self.widgets.fourthSellButton:
-            fourthSellPercentageAmount = (100 / 100) * self.initialCoin
-            self.widgets.sellBox.setValue(round(fourthSellPercentageAmount, 6))
+            fourthSellPercentageAmount = min(self.initialCoin, round(self.initialCoin, 6))
+            self.widgets.sellBox.setValue(fourthSellPercentageAmount)
 
 # Logic for displaying price
     def updatePrice(self):
