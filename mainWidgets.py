@@ -1,13 +1,12 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (QWidget, QComboBox,
-                              QPushButton, QLabel,
-                              QLineEdit, QGridLayout,
-                              QVBoxLayout, QHBoxLayout,
-                              QDoubleSpinBox
+    QPushButton, QLabel,
+    QLineEdit, QGridLayout,
+    QVBoxLayout, QHBoxLayout,
+    QDoubleSpinBox, QMessageBox
 )
 
-# Initialize widgets
 class Widgets(QWidget):
   def __init__(self):
       super().__init__()
@@ -15,9 +14,7 @@ class Widgets(QWidget):
       self.mainWidgets()
       self.mainLayout()
 
-# Add widgets
   def mainWidgets(self):
-      
       self.mainWidget = QWidget()
       self.mainWidget.setStyleSheet("background-color: #000000;")
 
@@ -29,79 +26,117 @@ class Widgets(QWidget):
       self.addBalanceWidget.setMaximumSize(200, 96)
 
       self.feesWidget = QWidget()
-      self.feesWidget.setWindowTitle("Configure fees and slippage")
+      self.feesWidget.setWindowTitle("Settings")
       self.feesWidget.setMaximumSize(200, 116)
 
-      self.chart = QWebEngineView()
+      self.statsWid = QWidget()
+      self.statsWid.setWindowTitle("Statistics")
+      self.statsWid.setStyleSheet("background-color: #000000;")
+      self.statsWid.setMinimumSize(800, 400)
 
+      self.chart = QWebEngineView()
       self.tickerTape = QWebEngineView()
       self.tickerTape.setFixedHeight(60)
 
       self.buyButtonsStyle = """
-            QPushButton {
-                background-color: #303336;    
-                color: #BAC7CF;               
-                border-radius: 5px;
-                padding: 6px 12px;
-            }"""
+    QPushButton {
+        background-color: #303336;
+        color: #BAC7CF;  
+    }
+"""
 
       textStyle = "color: #BAC7CF;"
 
       self.activeBuyStyle = """
     QPushButton {
-        background-color: #303336;    
-        color: #BAC7CF;               
+        background-color: #303336;
+        color: #BAC7CF;
         border: 1px solid #0ABF34;     
-        border-radius: 5px;
-        padding: 6px 12px;
     }
 """
+
+      self.activeSellStyle = """
+    QPushButton {
+        background-color: #303336;    
+        color: #BAC7CF;
+        border: 1px solid #BF0A19;     
+    }
+"""
+
+      self.infoBtns = """
+    QLabel {
+        background-color: #000000;    
+        color: #BAC7CF;
+        border: 1px solid #303336;     
+    }
+"""
+
       self.buyButton = QPushButton("Buy")
       self.buyButton.setStyleSheet("background-color: #0ABF34;")
       self.firstBuyButton = QPushButton("25%")
-      self.firstBuyButton.setStyleSheet(self.buyButtonsStyle)
       self.secondBuyButton = QPushButton("50%")
-      self.secondBuyButton.setStyleSheet(self.buyButtonsStyle)
       self.thirdBuyButton = QPushButton("75%")
-      self.thirdBuyButton.setStyleSheet(self.buyButtonsStyle)
       self.fourthBuyButton = QPushButton("100%")
-      self.fourthBuyButton.setStyleSheet(self.buyButtonsStyle)
 
       self.sellButton = QPushButton("Sell")
       self.sellButton.setStyleSheet("background-color: #BF0A19")
       self.firstSellButton = QPushButton("25%")
-      self.firstSellButton.setStyleSheet(self.buyButtonsStyle)
       self.secondSellButton = QPushButton("50%")
-      self.secondSellButton.setStyleSheet(self.buyButtonsStyle)
       self.thirdSellButton = QPushButton("75%")
-      self.thirdSellButton.setStyleSheet(self.buyButtonsStyle)
       self.fourthSellButton = QPushButton("100%")
-      self.fourthSellButton.setStyleSheet(self.buyButtonsStyle)
+
+      self.statsReset = QPushButton("Reset Statistics")
+
+      percButton = [self.firstBuyButton, self.secondBuyButton, self.thirdBuyButton,
+                    self.fourthBuyButton, self.firstSellButton, self.secondSellButton,
+                    self.thirdSellButton, self.fourthSellButton, self.statsReset]
+      
+      for perc in percButton:
+        perc.setStyleSheet(self.buyButtonsStyle)
 
       self.balanceButton = QPushButton("Accept")
       self.feesButton = QPushButton("Accept")
 
+      self.investedBtn = QLabel("Invested\n-")
+      self.soldBtn = QLabel("Sold\n-")
+      self.remainBtn = QLabel("Reamining\n-")
+      self.statsBtc = QLabel("BTC Bought\n-")
+      self.statsEth = QLabel("ETH Bought\n-")
+      self.statsSol = QLabel("SOL Bought\n-")
+      self.remainStatsBtc = QLabel("BTC Remaining\n-")
+      self.remainStatsEth = QLabel("ETH Remaining\n-")
+      self.remainStatsSol = QLabel("SOL Remaining\n-")
+      self.soldStatsBtc = QLabel("BTC Sold\n-")
+      self.soldStatsEth = QLabel("ETH Sold\n-")
+      self.soldStatsSol = QLabel("SOL Sold\n-")
+      self.statsCurrBal = QLabel("Current Balance\n-")
+      self.statsBalance = QLabel("Balance Added\n-")
+      self.statsSpent = QLabel("Money Spent\n-")
+      self.statsWin = QLabel("Winnings\n-")
+      self.timeSpent = QLabel("Time Spent\n00:00:00")
+
+      info = [self.investedBtn, self.soldBtn, self.remainBtn,
+              self.statsBtc, self.statsEth, self.statsSol, self.remainStatsBtc,
+              self.remainStatsEth, self.remainStatsSol, self.soldStatsBtc,
+              self.soldStatsEth, self.soldStatsSol, self.statsBalance, 
+              self.statsSpent, self.statsWin, self.statsCurrBal, self.timeSpent]
+
+      for btn in info:
+        btn.setStyleSheet(self.infoBtns)
+        btn.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
       self.combobox = QComboBox()
-      self.combobox.addItem('Bitcoin')
-      self.combobox.addItem('Ethereum')
-      self.combobox.addItem('Solana')
-      self.combobox.setStyleSheet("""background-color: #303336;
-                                  color: #BAC7CF;""")
+      self.combobox.addItems(['Bitcoin', 'Ethereum', 'Solana'])
+      self.combobox.setStyleSheet("""background-color: #303336; color: #BAC7CF;""")
 
       self.balance = QLabel("Balance: 0 $")
-      self.balance.setStyleSheet(textStyle)
       self.price = QLabel("Price:")
-      self.price.setStyleSheet(textStyle)
-      self.buyBoxAmount = QLabel("Amount: 0 $")
-      self.buyBoxAmount.setStyleSheet(textStyle)
-      self.error = QLabel()
-      self.error.setStyleSheet(textStyle)
-      self.errorText = QLabel()
       self.invested = QLabel("Invested: 0")
-      self.invested.setStyleSheet(textStyle)
+      self.buyBoxAmount = QLabel("Amount: 0 $")
       self.sellBoxAmount = QLabel("Amount: 0")
-      self.sellBoxAmount.setStyleSheet(textStyle)
-
+      self.error = QLabel()
+      self.errorText = QLabel()
+      
       self.insertFeesText = QLabel("Default is set to 0.2 for fees and 0.05 for slippage")
       self.addBalance = QLabel("Add the balance amount:")
       self.fees = QLabel("Adjust fees amount:")
@@ -116,14 +151,23 @@ class Widgets(QWidget):
 
       self.buyBox = QDoubleSpinBox()
       self.buyBox.clear()
-      self.buyBox.setStyleSheet(textStyle)
 
       self.sellBox = QDoubleSpinBox()
-      self.sellBox.setDecimals(15)
+      self.sellBox.setDecimals(8)
       self.sellBox.clear()
-      self.sellBox.setStyleSheet(textStyle)
 
-# Store the code from TradingView
+      text = [self.balance, self.buyBoxAmount, self.price, self.error, self.invested,
+              self.sellBoxAmount, self.buyBox, self.sellBox]
+
+      for txt in text:
+        txt.setStyleSheet(textStyle)
+
+      self.loginError = QMessageBox()
+      self.loginError.setIcon(QMessageBox.Icon.Critical)
+      self.loginError.setWindowTitle("Error")
+      self.loginError.setText("")
+      self.loginError.setStandardButtons(QMessageBox.StandardButton.Ok)
+
       tickerTape = '''
 <div class="tradingview-widget-container">
   <div class="tradingview-widget-container__widget"></div>
@@ -212,17 +256,14 @@ class Widgets(QWidget):
   </script>
 </div>'''
 
-# Set the code from TradingView
       self.chart.setHtml(self.btcCode)
       self.tickerTape.setHtml(tickerTape)
 
   def mainLayout(self):
-# Main grid layout for the app
     self.gridLayout = QGridLayout()
     self.gridLayout.addWidget(self.tickerTape, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
     self.gridLayout.addWidget(self.chart, 1, 3, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
 
-# Add widgets to layouts
     self.leftLayout = QVBoxLayout()
     self.leftLayout.addWidget(self.combobox)
     
@@ -262,11 +303,15 @@ class Widgets(QWidget):
     self.sellLayout.addWidget(self.thirdSellButton)
     self.sellLayout.addWidget(self.fourthSellButton)
 
+    self.infoLayout = QHBoxLayout()
+    self.infoLayout.addWidget(self.investedBtn)
+    self.infoLayout.addWidget(self.soldBtn)
+    self.infoLayout.addWidget(self.remainBtn)
+
     self.errorTextLayout = QVBoxLayout()
     self.errorTextLayout.addWidget(self.errorText)
     self.errorWidget.setLayout(self.errorTextLayout)
 
-# Main layout for the left panel
     self.leftLayout.addLayout(self.balanceMainLayout)
     self.leftLayout.addLayout(self.priceLayout)
     self.leftLayout.addLayout(self.buyBoxLayout)
@@ -275,21 +320,18 @@ class Widgets(QWidget):
     self.leftLayout.addLayout(self.sellBoxLayout)
     self.leftLayout.addLayout(self.sellLayout)
     self.leftLayout.addLayout(self.buttonsLayout)
+    self.leftLayout.addLayout(self.infoLayout)
 
     self.gridLayout.addLayout(self.errorLayout, 3, 0 , 1, 1)
     self.gridLayout.addLayout(self.leftLayout, 1, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignTop)
-    
     self.mainWidget.setLayout(self.gridLayout)
 
-# Layout for adding balance
     self.balanceLayout = QVBoxLayout()
     self.balanceLayout.addWidget(self.addBalance)
     self.balanceLayout.addWidget(self.insertBalance)
     self.balanceLayout.addWidget(self.balanceButton)
-    
     self.addBalanceWidget.setLayout(self.balanceLayout)
 
-# Layout for adjusting fees and slippage
     self.feesLayout = QVBoxLayout()
     self.feesLayout.addWidget(self.insertFeesText)
     self.feesLayout.addWidget(self.fees)
@@ -297,10 +339,51 @@ class Widgets(QWidget):
     self.feesLayout.addWidget(self.slippage)
     self.feesLayout.addWidget(self.insertSlippage)
     self.feesLayout.addWidget(self.feesButton)
-
     self.feesWidget.setLayout(self.feesLayout)
 
-# Login window
+    self.firstLayer = QHBoxLayout()
+    self.firstLayer.addWidget(self.statsBtc)
+    self.firstLayer.addWidget(self.statsEth)
+    self.firstLayer.addWidget(self.statsSol)
+
+    self.thirdLayer = QHBoxLayout()
+    self.thirdLayer.addWidget(self.soldStatsBtc)
+    self.thirdLayer.addWidget(self.soldStatsEth)
+    self.thirdLayer.addWidget(self.soldStatsSol)
+
+    self.secondLayer = QHBoxLayout()
+    self.secondLayer.addWidget(self.remainStatsBtc)
+    self.secondLayer.addWidget(self.remainStatsEth)
+    self.secondLayer.addWidget(self.remainStatsSol)
+
+    self.fourthLayer = QHBoxLayout()
+    self.fourthLayer.addWidget(self.statsCurrBal)
+    self.fourthLayer.addWidget(self.statsBalance)
+    self.fourthLayer.addWidget(self.statsSpent)
+    self.fourthLayer.addWidget(self.statsWin)
+
+    self.leftLay = QVBoxLayout()
+    self.leftLay.addLayout(self.firstLayer)
+    self.leftLay.addLayout(self.thirdLayer)
+    self.leftLay.addLayout(self.secondLayer)
+    self.leftLay.addLayout(self.fourthLayer)
+    
+    self.firstRightLayer = QHBoxLayout()
+    self.firstRightLayer.addWidget(self.timeSpent)
+
+    self.secondRightLayer = QHBoxLayout()
+    self.secondRightLayer.addWidget(self.statsReset)
+
+    self.rightLay = QVBoxLayout()
+    self.rightLay.addLayout(self.firstRightLayer)
+    self.rightLay.addLayout(self.secondRightLayer)
+
+    self.mainStatsLay = QGridLayout()
+    self.mainStatsLay.addLayout(self.leftLay, 0,0,2,2)
+    self.mainStatsLay.addLayout(self.rightLay, 0,2,2,2, alignment=Qt.AlignmentFlag.AlignTop)
+    self.statsWid.setLayout(self.mainStatsLay)
+
+
 class LoginScreen(QWidget):
   def __init__(self):
     super().__init__()
@@ -312,7 +395,6 @@ class LoginScreen(QWidget):
     self.loginLayout()
 
   def loginWidgets(self):
-
     self.usernameInput = QLineEdit()
     self.usernameInput.setPlaceholderText("Name")
     self.passwordInput = QLineEdit()
@@ -323,7 +405,6 @@ class LoginScreen(QWidget):
 
     self.registerText = QLabel("Don't have an account? Register here!")
 
-# Login window layout
   def loginLayout(self):
     layout = QVBoxLayout()
     layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -331,10 +412,8 @@ class LoginScreen(QWidget):
     layout.addWidget(self.loginButton, alignment=Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(self.registerText, alignment=Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(self.registerButton, alignment=Qt.AlignmentFlag.AlignCenter)
-
     self.setLayout(layout)
 
-# Register window
 class RegisterScreen(QWidget):
   def __init__(self):
     super().__init__()
@@ -348,22 +427,19 @@ class RegisterScreen(QWidget):
   def registerWidgets(self):
     self.usernameInput = QLineEdit()
     self.usernameInput.setPlaceholderText("Name")
-    self.emailInput = QLineEdit()
-    self.emailInput.setPlaceholderText("Email")
     self.passwordInput = QLineEdit()
     self.passwordInput.setPlaceholderText("Password")
     self.reenterPassword = QLineEdit()
     self.reenterPassword.setPlaceholderText("Re-enter password")
 
+    self.registerBtn = QPushButton("Register")
     self.backButton = QPushButton("Back")
 
-# Register window layout
   def registerLayout(self):
     layout = QVBoxLayout()
     layout.addWidget(self.usernameInput, alignment=Qt.AlignmentFlag.AlignCenter)
-    layout.addWidget(self.emailInput, alignment=Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(self.passwordInput, alignment=Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(self.reenterPassword, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(self.registerBtn, alignment=Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(self.backButton, alignment=Qt.AlignmentFlag.AlignCenter)
-
     self.setLayout(layout)

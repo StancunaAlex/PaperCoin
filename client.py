@@ -10,7 +10,7 @@ def fetchPrice(coinSymbol):
     if coinSymbol in cache:
         cachedData = cache[coinSymbol]
         if currentTime - cachedData["timestamp"] < CACHE_TIMEOUT:
-            print(f"Using cached price for {coinSymbol}")
+            print(f"Cached price for {coinSymbol}")
             return {"price": cachedData["price"], "cached": True}
 
     try:
@@ -22,11 +22,12 @@ def fetchPrice(coinSymbol):
         if "price" in data:
             price = data["price"]
             cache[coinSymbol] = {"price": price, "timestamp": currentTime}
-            print(f"Fetched new price for {coinSymbol}: {price}")
+            print(f"Updated price: {coinSymbol}: {price}")
             return {"price": price, "cached": False}
         else:
             print(f"Error: {data.get('error', 'Unknown error')}")
             return {"error": "Failed to fetch price"}
+        
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return {"error": str(e)}

@@ -3,7 +3,6 @@ import requests
 
 app = Flask(__name__)
 
-# Add coins and convert them for the url
 coinList = {
     "btc": "bitcoin",
     "eth": "ethereum",
