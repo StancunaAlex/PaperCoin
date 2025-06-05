@@ -29,5 +29,8 @@ def get_price(coin):
         print(f"Unexpected error: {e}")
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
+def main():
     app.run(debug=True)
+    
+if __name__ == '__main__':
+    main()

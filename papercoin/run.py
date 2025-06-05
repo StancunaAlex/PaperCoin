@@ -1,6 +1,6 @@
 import sys
-from database import startDb
-from logic import Login
+from .database import startDb
+from .logic import Login
 from PyQt6.QtWidgets import QApplication
 
 def main():

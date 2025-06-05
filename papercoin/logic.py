@@ -1,8 +1,8 @@
 from PyQt6.QtCore import QEvent, QTimer, QTime
 from PyQt6.QtGui import QAction, QDoubleValidator, QRegularExpressionValidator
 from PyQt6.QtWidgets import QMainWindow
-from mainWidgets import Widgets, RegisterScreen, LoginScreen
-from client import fetchPrice
+from .mainWidgets import Widgets, RegisterScreen, LoginScreen
+from .client import fetchPrice
 import sqlite3
 
 class MainScreen(QMainWindow):
