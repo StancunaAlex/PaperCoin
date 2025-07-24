@@ -1,7 +1,7 @@
 # PaperCoin
 
 PaperCoin is a simple Python-based trading app. It allows you to simulate and try out any trading strategies on layer 1 coins. It is part of a small project for learning and developing Python applications.
-The app uses Flask, Requests and PyQt6.
+The app uses Flask, Requests, PyQt6 and SQLite.
 
 
 ## Features
