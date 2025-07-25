@@ -1,5 +1,7 @@
 import threading
-from . import run, endpoint
+
+import run
+import endpoint
 
 def start_flask():
     endpoint.app.run(debug=False)
